@@ -70,6 +70,19 @@ while True:
         dig.ver_digrafo()
         
     elif a == 10:
+        print("Escolha o nó que deseja começar o BFS:")
+        init = input()
+        dig.BFS(init)
+        print("O menu voltara em 15 segundos")
+        time.sleep(15)
+        
+    # elif a == 11:
+        
+    # elif a == 12:
+        
+    # elif a == 13:
+        
+    elif a == 14:
         break
     
     else:

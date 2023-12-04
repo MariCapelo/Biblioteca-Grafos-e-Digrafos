@@ -16,12 +16,21 @@ class Digrafo:
         #As arestas podem ser adicionadas tanto por inserção direta, ou seja digitando quais serão os verticies e o peso da aresta, 
         # quanto pela leitura de um arquivo dado.
         if numeros:
-            self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=numeros[0][2])
-            self.num_m += 1
-            if numeros[0][0] not in self.vertices:
-                self.vertices.append(numeros[0][0])
-            if numeros[0][1] not in self.vertices:
-                self.vertices.append(numeros[0][1])
+            print("estou aqui")
+            if len(numeros) == 2:
+                self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=numeros[0][2])
+                self.num_m += 1
+                if numeros[0][0] not in self.vertices:
+                    self.vertices.append(numeros[0][0])
+                if numeros[0][1] not in self.vertices:
+                    self.vertices.append(numeros[0][1])
+            else:
+                self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=1)
+                self.num_m += 1
+                if numeros[0][0] not in self.vertices:
+                    self.vertices.append(numeros[0][0])
+                if numeros[0][1] not in self.vertices:
+                    self.vertices.append(numeros[0][1])
                 
         else:
             print("Digite respectivamente quem será o v1, v2 e o peso:")
@@ -40,6 +49,7 @@ class Digrafo:
             time.sleep(1)
         
     def ler_arquivo(self, data):
+        #Função para ler um arquivo de arestas e adiciona-las ao digrafo 
         try:
             with open(data, "r") as arquivo:
                 A = arquivo.readlines()
@@ -90,7 +100,7 @@ class Digrafo:
             
             
     def maior_d(self):
-        #Função que retorna o verticie de de maior grau e o valor do maior grau
+        #Função que retorna os verticies de de maior grau e o valor do maior grau tanto de entrada como de saida
         maxD_entradaN = None
         maxD_entrada = -1
 
@@ -105,7 +115,8 @@ class Digrafo:
             degree = self.digrafo.in_degree(node)
             if degree == maxD_entrada:
                 ListMEDN.append(node)
-        print("Os vertices de maior grau de entrada / Valor maior grau de entrada: " + ListMEDN + " / " + str(maxD_entrada))
+        print("Valor maior grau de entrada: ", maxD_entrada)
+        print("Os vertices de maior grau de entrada: ", ListMEDN)
         
         maxD_saidaN = None
         maxD_saida = -1
@@ -120,11 +131,12 @@ class Digrafo:
             degree = self.digrafo.out_degree(node)
             if degree == maxD_saida:
                 ListMSDN.append(node)
-        print("O vertice de maior grau de saida / Valor maior grau de saida: " + ListMSDN + " / " + str(maxD_saida))
+        print("Valor maior grau de saida: ", maxD_saida)
+        print("Os vertices de maior grau de saida: ", ListMSDN)
                 
                     
     def menor_d(self):
-        #Função que retorna o verticie de menor grau e o valor do menor grau
+        #Função que retorna os verticies de menor grau e o valor do menor grau tanto de entrada como de saida
         minD_entradaN = None
         minD_entrada = self.digrafo.in_degree(self.vertices[0])
 
@@ -139,7 +151,8 @@ class Digrafo:
             degree = self.digrafo.in_degree(node)
             if degree == minD_entrada:
                 ListMIDE.append(node)
-        print("O vertice de menor grau de entrada / Valor menor grau de entrada:", ListMIDE, minD_entrada)
+        print("Valor menor grau de entrada:", minD_entrada)
+        print("O vertice de menor grau de entrada: ", ListMIDE)
        
         minD_saidaN = None
         minD_saida = self.digrafo.out_degree(self.vertices[0])
@@ -154,7 +167,8 @@ class Digrafo:
             degree = self.digrafo.out_degree(node)
             if degree == minD_saida:
                 ListMIDS.append(node)
-        print("O vertice de maior grau de saida / Valor maior grau de saida:", ListMIDS, minD_saida)
+        print("Valor menor grau de saida: ",minD_saida)
+        print("Os vertices de menor grau de saida: ", ListMIDS)
         
         
     def pesoN(self, u, v):
@@ -170,5 +184,55 @@ class Digrafo:
         
     
     def ver_digrafo(self):
+        #FUnção que mostra o grafo desenhado pelo biblioteca matplotlib
         nx.draw_circular(self.digrafo, with_labels=True) 
         ptl.show()
+        
+        
+    def BFS(self, origem):
+        
+        fila = [origem]
+    
+        # Inicializa o dicionário de níveis com o nó de origem
+        niveis = {origem:0}
+
+        # Vai armazenar 
+        pais = {origem: None}
+        
+        # Enquanto a fila não estiver vazia
+        while fila:
+            # Remove o primeiro nó da fila
+            atual = fila.pop(0)
+            
+            # Visita todos os vizinhos do nó atual
+            for vizinho in self.digrafo[atual]:
+                # Se o vizinho ainda não foi visitado
+                if vizinho not in niveis:
+                    # Adiciona o vizinho na fila
+                    fila.append(vizinho)
+                    
+                    # Define o nível do vizinho
+                    niveis[vizinho] = niveis[atual] + 1
+                    
+                    # Define o pai do vizinho
+                    pais[vizinho] = atual
+                    
+        # Constrói a árvore a partir do dicionário de pais
+        arvore = nx.DiGraph()
+        for filho, pai in pais.items():
+            if pai is not None:
+                arvore.add_edge(pai, filho)
+        
+        #Percorre o dicionario niveis
+        for chave, valor in niveis.items():
+            print("A Distancia de ", origem, " ate ", chave, " é: ", valor)
+        
+        # Se algum vertice nao tiver sido acessado no BFS essa função ira dizer quem foi que nao deu pra ser acessado
+        for n in self.vertices:
+            if n not in niveis.keys():
+                print("Foi foi possivel acessar ", n, " a partir de ", origem)
+        
+        nx.draw_spectral(arvore, with_labels=True)
+        ptl.show()
+             
+        
