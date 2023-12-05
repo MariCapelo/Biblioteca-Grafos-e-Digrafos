@@ -1,4 +1,6 @@
 #bibliotecas nescessárias
+import networkx as nx
+import matplotlib.pyplot as ptl
 import heapq
 import collections
 
@@ -14,7 +16,9 @@ class Grafo:
 
     #função que retorna o grafo
     def retornaGrafo(self):
-     return dict(self.g)
+        G = nx.Graph(self.g)
+        nx.draw_spectral(G, with_labels=True)
+        ptl.show()
     
     #função que retorna o numero de aresta do grafo
     def numeroAresta(self):
@@ -174,17 +178,21 @@ class Grafo:
         # Retorna as distâncias mínimas de todos os vértices ao vértice inicial
         return distancia
 
-    
-    # isso aqui pode tá mt errado
+
     def ler_arquivo(grafo, nome_do_arquivo):
         # Abre o arquivo e lê linha por linha
-        with open(nome_do_arquivo, 'r') as arquivo:
-            for linha in arquivo:
-                # Divide a linha em origem, destino e peso
-                origem, destino, peso = linha.strip().split()
+        try:
+            with open(nome_do_arquivo, 'r') as arquivo:
+                for linha in arquivo:
+                    # Divide a linha em origem, destino e peso
+                    origem, destino, peso = linha.strip().split()[1:]
+                    # Adiciona o arco ao grafo
+                    grafo.adicionaAresta(str(origem), str(destino), int(peso))
+            print("Arquivo lido com sucesso :)")
 
-                # Adiciona o arco ao grafo
-                grafo.adicionaAresta(origem, destino, int(peso))
+        except:
+            print("Erro ao ler o arquivo :(")
+
 
 
 

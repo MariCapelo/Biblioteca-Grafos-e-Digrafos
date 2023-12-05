@@ -1,7 +1,6 @@
 import networkx as nx 
 import matplotlib.pyplot as ptl
 import time
-import heapq
 
 class Digrafo:
     def __init__(self):
@@ -18,14 +17,14 @@ class Digrafo:
         # quanto pela leitura de um arquivo dado.
         if numeros:
             if len(numeros) == 2:
-                self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=numeros[0][2])
+                self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=int(numeros[0][2]))
                 self.num_m += 1
                 if numeros[0][0] not in self.vertices:
                     self.vertices.append(numeros[0][0])
                 if numeros[0][1] not in self.vertices:
                     self.vertices.append(numeros[0][1])
             else:
-                self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=1)
+                self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=int(1))
                 self.num_m += 1
                 if numeros[0][0] not in self.vertices:
                     self.vertices.append(numeros[0][0])
@@ -284,24 +283,60 @@ class Digrafo:
     
     def bellman_ford(self, origem):
         # Inicializa as distâncias de todos os vértices como infinito, exceto o vértice inicial
-        distancia = {vertice: float('inf') for vertice in self.g}
+        distancia = {vertice: float('inf') for vertice in self.digrafo}
         distancia[origem] = 0
 
         # Relaxa todas as arestas V-1 vezes
-        for _ in range(len(self.g) - 1):
-            for vertice in self.g:
-                for vizinho in self.g[vertice]:
-                    if distancia[vertice] + self.g[vertice][vizinho] < distancia[vizinho]:
-                        distancia[vizinho] = distancia[vertice] + self.g[vertice][vizinho]
+        for _ in range(len(self.digrafo) - 1):
+            for s, d, w in self.digrafo.edges(data='weight'):
+                if distancia[s] != float("Inf") and distancia[s] + w < distancia[d]:
+                    distancia[d] = int(distancia[s]) + int(w)
 
         # Verifica se existem ciclos de peso negativo
-        for vertice in self.g:
-            for vizinho in self.g[vertice]:
-                if distancia[vertice] + self.g[vertice][vizinho] < distancia[vizinho]:
-                    raise ValueError('Grafo contém um ciclo de peso negativo')
-
+        for s, d, w in self.digrafo.edges(data='weight'):
+            if distancia[s] != float("Inf") and distancia[s] + w < distancia[d]:
+                print("O digrafo contem ciclos negativos")
+                return
+            
         # Retorna as distâncias mínimas de todos os vértices ao vértice inicial
-        #Percorre o dicionario niveis
+        #Percorre o dicionario distancia
         for chave, valor in distancia.items():
-            print("A Distancia de ", origem, " ate ", chave, " é: ", valor)
+            print("A Distancia minima de ", origem, " ate ", chave, " é: ", valor)
+        
+        predecessor = list(nx.bellman_ford_predecessor_and_distance(self.digrafo, origem)[0].values())
+        print("\nLista de predecessores de cada um dos vertices seguindo a ordem de cima:")
+        print(predecessor)
+        
+        
+    def dijkstra(self, vertice_inicial):
+            
+            # Inicializa as distâncias de todos os vértices como infinito, exceto o vértice inicial
+            distancias = {vertice: float('inf') for vertice in self.digrafo}
+            distancias[vertice_inicial] = 0
+
+            # Inicializa o dicionário de predecessores
+            predecessor = {vertice: None for vertice in self.digrafo}
+
+            # Relaxa todas as arestas V-1 vezes
+            for _ in range(len(self.digrafo) - 1):
+                for s, d, w in self.digrafo.edges(data='weight'):
+                    if distancias[s] != float("Inf") and distancias[s] + w < distancias[d]:
+                        distancias[d] = distancias[s] + w
+                        predecessor[d] = s
+
+            # Verifica se existem ciclos de peso negativo
+            for s, d, w in self.digrafo.edges(data='weight'):
+                if distancias[s] != float("Inf") and distancias[s] + w < distancias[d]:
+                    print("O digrafo contem ciclos negativos")
+                    break
+
+            # Retorna as distâncias mínimas de todos os vértices ao vértice inicial e o vértice predecessor no caminho mínimo de v até cada vértice
+            for chave, valor in distancias.items():
+                print("A Distancia minima de ", vertice_inicial, " ate ", chave, " é: ", valor)
+        
+            
+            predecessor = list(predecessor.values())
+            print("\nLista de predecessores de cada um dos vertices seguindo a ordem de cima:")
+            print(predecessor)
+
         
