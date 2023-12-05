@@ -1,7 +1,9 @@
 from Digrafo import Digrafo
+from Grafo import Grafo
 import time
 
 dig = Digrafo()
+graf = Grafo()
 
 while True:
     print("-"*40)
@@ -76,9 +78,16 @@ while True:
         print("O menu voltara em 15 segundos")
         time.sleep(15)
         
-    # elif a == 11:
+    elif a == 11:
+        print("Escolha o vertice que deseja começar o DFS:")
+        init = input()
+        dig.DFS(init)
+        print("O menu voltara em 15 segundos")
+        time.sleep(15)
         
-    # elif a == 12:
+    elif a == 12:
+        print("Escolha o vertice inicial para o algoritmo de Bellman-Ford:")
+        init = input()
         
     # elif a == 13:
         

@@ -89,7 +89,7 @@ class Grafo:
         # Retorna o vértice com o maior grau
         return maior_vertice
     
-    def busca_em_largura(self, vertice_inicial):
+    def BFS(self, vertice_inicial):
         # Cria uma fila para os vértices a serem visitados
         fila = collections.deque([vertice_inicial])
 
@@ -110,14 +110,14 @@ class Grafo:
                     visitados.add(vizinho)
     
 
-    def BuscaProfundidade(self, vertice_inicial):
+    def DFS(self, vertice_inicial):
         # Cria um conjunto para os vértices já visitados
         visitados = set()
 
         # Chama a função auxiliar de busca em profundidade
         self.BuscaProfundidadeAux(vertice_inicial, visitados)
 
-    def BuscaProfundidadeAux(self, vertice, visitados):
+    def DFSAux(self, vertice, visitados):
         # Marca o vértice atual como visitado
         visitados.add(vertice)
 
@@ -176,7 +176,7 @@ class Grafo:
 
     
     # isso aqui pode tá mt errado
-    def adicionar_arcos_do_arquivo_ao_grafo(grafo, nome_do_arquivo):
+    def ler_arquivo(grafo, nome_do_arquivo):
         # Abre o arquivo e lê linha por linha
         with open(nome_do_arquivo, 'r') as arquivo:
             for linha in arquivo:

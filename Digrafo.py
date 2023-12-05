@@ -1,6 +1,7 @@
 import networkx as nx 
 import matplotlib.pyplot as ptl
 import time
+import heapq
 
 class Digrafo:
     def __init__(self):
@@ -16,7 +17,6 @@ class Digrafo:
         #As arestas podem ser adicionadas tanto por inserção direta, ou seja digitando quais serão os verticies e o peso da aresta, 
         # quanto pela leitura de um arquivo dado.
         if numeros:
-            print("estou aqui")
             if len(numeros) == 2:
                 self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=numeros[0][2])
                 self.num_m += 1
@@ -190,7 +190,7 @@ class Digrafo:
         
         
     def BFS(self, origem):
-        
+        #A função realiza busca em largura no digrafo a partir de uma origem selecionada
         fila = [origem]
     
         # Inicializa o dicionário de níveis com o nó de origem
@@ -235,4 +235,73 @@ class Digrafo:
         nx.draw_spectral(arvore, with_labels=True)
         ptl.show()
              
+          
+    def DFS(self, origem):
+        #Inicio da função de busca em profundidade
+        visitados = set()
+        inicio = None
+        fim = None
+        tempo = None
+        print("A ordem de visitação foi:")
+        print("Lista do tempo em que cada vertice começou a ser visitado / Lista do tempo que cada vertice terminou de ser visitado: ", self.DFSaux(origem, visitados, inicio, fim, tempo))
+        
+    def DFSaux(self ,atual, visitados, inicio, fim, tempo): 
+        
+        #setando cada um dos componentes que sera usado para a busca em profundidade
+        
+        if inicio is None:
+            #Vai guardar os tempos iniciais em que cada vertice foi visitado
+            inicio = {}
+            
+        if fim is None:
+            #Vai guardar os tempos em que os vertices acabaram de serem visitados
+            fim = {}
+            
+        if tempo is None:
+            #Lista que ira fazer o controle do tempo 
+            tempo = [0]
+            
+        #adiciona os vizinhos visitados na Lista de visitados
+        visitados.add(atual)
+        
+        #adiciona o tempo de começo de visitação de um vertice e conta mais um no tempo 
+        inicio[atual] = tempo[0]
+        tempo[0] += 1
+        
+        #Mostra qual vertice esta sendo visitado agora 
+        print(atual)
+        
+        for vizinho in self.digrafo[atual]:
+            if vizinho not in visitados:
+                self.DFSaux(vizinho, visitados, inicio, fim, tempo)
+                
+        #Adiciona o tempo que o vertice terminou de ser visitado e conta mais um no tempo
+        fim[atual] = tempo[0]
+        tempo[0] += 1
+        
+        return inicio, fim
+    
+    
+    def bellman_ford(self, origem):
+        # Inicializa as distâncias de todos os vértices como infinito, exceto o vértice inicial
+        distancia = {vertice: float('inf') for vertice in self.g}
+        distancia[origem] = 0
+
+        # Relaxa todas as arestas V-1 vezes
+        for _ in range(len(self.g) - 1):
+            for vertice in self.g:
+                for vizinho in self.g[vertice]:
+                    if distancia[vertice] + self.g[vertice][vizinho] < distancia[vizinho]:
+                        distancia[vizinho] = distancia[vertice] + self.g[vertice][vizinho]
+
+        # Verifica se existem ciclos de peso negativo
+        for vertice in self.g:
+            for vizinho in self.g[vertice]:
+                if distancia[vertice] + self.g[vertice][vizinho] < distancia[vizinho]:
+                    raise ValueError('Grafo contém um ciclo de peso negativo')
+
+        # Retorna as distâncias mínimas de todos os vértices ao vértice inicial
+        #Percorre o dicionario niveis
+        for chave, valor in distancia.items():
+            print("A Distancia de ", origem, " ate ", chave, " é: ", valor)
         
