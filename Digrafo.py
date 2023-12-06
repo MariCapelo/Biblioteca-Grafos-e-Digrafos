@@ -242,7 +242,7 @@ class Digrafo:
         fim = None
         tempo = None
         print("A ordem de visitação foi:")
-        print("Lista do tempo em que cada vertice começou a ser visitado / Lista do tempo que cada vertice terminou de ser visitado: ", self.DFSaux(origem, visitados, inicio, fim, tempo))
+        self.DFSaux(origem, visitados, inicio, fim, tempo)
         
     def DFSaux(self ,atual, visitados, inicio, fim, tempo): 
         
@@ -268,7 +268,8 @@ class Digrafo:
         tempo[0] += 1
         
         #Mostra qual vertice esta sendo visitado agora 
-        print(atual)
+        print("O vertice ", atual, " começou a ser visitado no tempo ", tempo[0])
+
         
         for vizinho in self.digrafo[atual]:
             if vizinho not in visitados:
@@ -278,6 +279,8 @@ class Digrafo:
         fim[atual] = tempo[0]
         tempo[0] += 1
         
+        
+        print("O vertice ", atual, " terminou de ser visitado no tempo ", tempo[0])
         return inicio, fim
     
     

@@ -140,7 +140,7 @@ elif escolha == 1:
         if a == 1:
             arquivo = input("Digite o nome do arquivo\n")
             graf.ler_arquivo(arquivo)
-            time.sleep(5)
+            time.sleep(2)
             
         elif a == 2:
             print("Digite um vertice: ")
@@ -163,11 +163,11 @@ elif escolha == 1:
             time.sleep(5)
         
         elif a == 6:
-            print("O grau maximo desse grafo é: ", graf.maiorGrau())
+            graf.maiorGrau()
             time.sleep(5)
         
         elif a == 7:
-            print("O grau minimo desse grafo é: ", graf.menorGrau())
+            graf.menorGrau()
             time.sleep(5)
             
         elif a == 8:
@@ -180,13 +180,33 @@ elif escolha == 1:
         elif a == 9:
             graf.retornaGrafo()
             
-        # elif a == 10:
+        elif a == 10:
+            print("Escolha o nó que deseja começar o BFS:")
+            init = input()
+            graf.BFS(init)
+            print("O menu voltara em 10 segundos")
+            time.sleep(10)
             
-        # elif a == 11:
+        elif a == 11:
+            print("Escolha o nó que deseja começar o DFS:")
+            init = input()
+            graf.DFS(init)
+            print("O menu voltara em 10 segundos")
+            time.sleep(10)
             
-        # elif a == 12:
+        elif a == 12:
+            print("Escolha o vertice inicial para o algoritmo de Bellman-Ford:")
+            init = input()
+            graf.bellman_ford(init)
+            print("O menu voltara em 10 segundos")
+            time.sleep(10)
             
-        # elif a == 13:
+        elif a == 13:
+            print("Escolha o vertice inicial para o algoritmo de DIJKSTRA:")
+            init = input()
+            graf.dijkstra(init)     
+            print("O menu voltara em 10 segundos")
+            time.sleep(10)
             
         elif a == 14:
             break

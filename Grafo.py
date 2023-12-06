@@ -8,25 +8,35 @@ class Grafo:
     #inicializando o grafo
     def __init__(self):
        #defaultdict pode automaticamente atribuir um valor padrao ao vertice
-        self.g = collections.defaultdict(dict)
+       self.g = nx.Graph()
+       self.num_m = 0
+        # self.g = collections.defaultdict(dict)
 
     #função que adiciona aresta
-    def adicionaAresta(self, origem, fim, peso):    
-        self.g[origem][fim] = int(peso)
+    def adicionaAresta(self, numeros):  
+        if len(numeros) == 2: 
+            self.g.add_edge(numeros[0][0], numeros[0][1], numeros[0][2])
+            self.num_m += 1
+            
+            
+        else:
+            self.g.add_edge(numeros[0][0], numeros[0][1], weight = int(1))
+            self.num_m += 1
+            
 
     #função que retorna o grafo
     def retornaGrafo(self):
         G = nx.Graph(self.g)
-        nx.draw_spectral(G, with_labels=True)
+        nx.draw_circular(G, with_labels=True)
         ptl.show()
     
     #função que retorna o numero de aresta do grafo
     def numeroAresta(self):
-        return sum(len(aresta) for aresta in self.g.values())
+        return self.num_m
     
     #função que retorna o numero de vertices do grafo
     def numeroVertice(self):
-        return len(self.g)
+        return self.g.number_of_nodes()
     
     #função que retorna os vertices vizinhos
     def verticeVizinho(self, vertice):    
@@ -67,8 +77,9 @@ class Grafo:
                 menor_grau = grau
                 menor_vertice = vertice
 
-        # Retorna o vértice com o menor grau
-        return menor_vertice
+        # Printa o vértice com o menor grau e o valor do menor grau 
+        print("O vertice de menor grau é: ", menor_vertice)
+        print("O valor de menor grau é: ", menor_grau)
     
     # função que retorna o vértice com o maior grau do grafo
     def maiorGrau(self):
@@ -90,48 +101,98 @@ class Grafo:
                 maior_grau = grau
                 maior_vertice = vertice
 
-        # Retorna o vértice com o maior grau
-        return maior_vertice
+        # Printa o vértice com o maior grau
+        print("O vertice de maior grau é: ", maior_vertice)
+        print("O valor do maior grau é: ", maior_grau)
     
-    def BFS(self, vertice_inicial):
-        # Cria uma fila para os vértices a serem visitados
-        fila = collections.deque([vertice_inicial])
+    def BFS(self, origem):
+        #A função realiza busca em largura no digrafo a partir de uma origem selecionada
+        fila = [origem]
+    
+        # Inicializa o dicionário de níveis com o nó de origem
+        niveis = {origem:0}
 
-        # Cria um conjunto para os vértices já visitados
-        visitados = set([vertice_inicial])
-
+        # Vai armazenar 
+        pais = {origem: None}
+        
+        # Enquanto a fila não estiver vazia
         while fila:
-            # Remove o próximo vértice da fila
-            vertice = fila.popleft()
-
-            # Imprime o vértice atual
-            print(vertice)
-
-            # Adiciona todos os vizinhos não visitados do vértice atual à fila
-            for vizinho in self.verticeVizinho(vertice):
-                if vizinho not in visitados:
+            # Remove o primeiro nó da fila
+            atual = fila.pop(0)
+            
+            # Visita todos os vizinhos do nó atual
+            for vizinho in self.g[atual]:
+                # Se o vizinho ainda não foi visitado
+                if vizinho not in niveis:
+                    # Adiciona o vizinho na fila
                     fila.append(vizinho)
-                    visitados.add(vizinho)
+                    
+                    # Define o nível do vizinho
+                    niveis[vizinho] = niveis[atual] + 1
+                    
+                    # Define o pai do vizinho
+                    pais[vizinho] = atual
+                    
+        # Constrói a árvore a partir do dicionário de pais
+        arvore = nx.DiGraph()
+        for filho, pai in pais.items():
+            if pai is not None:
+                arvore.add_edge(pai, filho)
+        
+        #Percorre o dicionario niveis
+        for chave, valor in niveis.items():
+            print("A Distancia de ", origem, " ate ", chave, " é: ", valor)
+        
+        nx.draw_spectral(arvore, with_labels=True)
+        ptl.show()
     
 
     def DFS(self, vertice_inicial):
         # Cria um conjunto para os vértices já visitados
         visitados = set()
+        inicio = None
+        fim = None
+        tempo = None
 
         # Chama a função auxiliar de busca em profundidade
-        self.BuscaProfundidadeAux(vertice_inicial, visitados)
+        print("Ordem em que os vertices foram visitados:")
+        self.DFSAux(vertice_inicial, inicio, fim, tempo, visitados)
 
-    def DFSAux(self, vertice, visitados):
+    def DFSAux(self, vertice, inicio, fim, tempo, visitados):
+         #setando cada um dos componentes que sera usado para a busca em profundidade
+        
+        if inicio is None:
+            #Vai guardar os tempos iniciais em que cada vertice foi visitado
+            inicio = {}
+            
+        if fim is None:
+            #Vai guardar os tempos em que os vertices acabaram de serem visitados
+            fim = {}
+            
+        if tempo is None:
+            #Lista que ira fazer o controle do tempo 
+            tempo = [0]
+            
         # Marca o vértice atual como visitado
         visitados.add(vertice)
 
+        inicio[vertice] = tempo[0]
+        tempo[0] += 1
+        
         # Imprime o vértice atual
-        print(vertice)
+        print("O vertice ", vertice, " começou a ser visitado no tempo ", tempo[0])
 
         # Visita recursivamente todos os vizinhos não visitados do vértice atual
         for vizinho in self.verticeVizinho(vertice):
             if vizinho not in visitados:
-                self.BuscaProfundidadeAux(vizinho, visitados)
+                self.DFSAux(vizinho, inicio, fim, tempo, visitados)
+                
+        #Adiciona o tempo que o vertice terminou de ser visitado e conta mais um no tempo
+        fim[vertice] = tempo[0]
+        tempo[0] += 1
+        
+        print("O vertice ", vertice, " terminou de ser visitado no tempo ", tempo[0])
+        return inicio, fim
 
     def bellman_ford(self, vertice_inicial):
         # Inicializa as distâncias de todos os vértices como infinito, exceto o vértice inicial
@@ -140,54 +201,67 @@ class Grafo:
 
         # Relaxa todas as arestas V-1 vezes
         for _ in range(len(self.g) - 1):
-            for vertice in self.g:
-                for vizinho in self.g[vertice]:
-                    if distancia[vertice] + self.g[vertice][vizinho] < distancia[vizinho]:
-                        distancia[vizinho] = distancia[vertice] + self.g[vertice][vizinho]
+            for s, d, w in self.g.edges(data='weight'):
+                if distancia[s] != float("Inf") and distancia[s] + w < distancia[d]:
+                    distancia[d] = int(distancia[s]) + int(w)
 
         # Verifica se existem ciclos de peso negativo
-        for vertice in self.g:
-            for vizinho in self.g[vertice]:
-                if distancia[vertice] + self.g[vertice][vizinho] < distancia[vizinho]:
-                    raise ValueError('Grafo contém um ciclo de peso negativo')
-
+        for s, d, w in self.g.edges(data='weight'):
+            if distancia[s] != float("Inf") and distancia[s] + w < distancia[d]:
+                print("O digrafo contem ciclos negativos")
+                return
+            
         # Retorna as distâncias mínimas de todos os vértices ao vértice inicial
-        return distancia
+        #Percorre o dicionario distancia
+        for chave, valor in distancia.items():
+            print("A Distancia minima de ", vertice_inicial, " ate ", chave, " é: ", valor)
+        
+        predecessor = list(nx.bellman_ford_predecessor_and_distance(self.g, vertice_inicial)[0].values())
+        print("\nLista de predecessores de cada um dos vertices seguindo a ordem de cima:")
+        print(predecessor)
     
     def dijkstra(self, vertice_inicial):
-        # Inicializa as distâncias de todos os vértices como infinito, exceto o vértice inicial
-        distancia = {vertice: float('inf') for vertice in self.g}
-        distancia[vertice_inicial] = 0
+       # Inicializa as distâncias de todos os vértices como infinito, exceto o vértice inicial
+            distancias = {vertice: float('inf') for vertice in self.g}
+            distancias[vertice_inicial] = 0
 
-        # Cria uma fila de prioridade para os vértices a serem visitados
-        fila_prioridade = [(0, vertice_inicial)]
+            # Inicializa o dicionário de predecessores
+            predecessor = {vertice: None for vertice in self.g}
 
-        while fila_prioridade:
-            # Remove o vértice com a menor distância da fila de prioridade
-            dist, vertice = heapq.heappop(fila_prioridade)
+            # Relaxa todas as arestas V-1 vezes
+            for _ in range(len(self.g) - 1):
+                for s, d, w in self.g.edges(data='weight'):
+                    if distancias[s] != float("Inf") and distancias[s] + w < distancias[d]:
+                        distancias[d] = distancias[s] + w
+                        predecessor[d] = s
 
-            # Verifica se a distância atual é a menor distância para o vértice
-            if dist == distancia[vertice]:
-                # Atualiza as distâncias dos vizinhos
-                for vizinho, peso in self.g[vertice].items():
-                    dist_vizinho = dist + peso
-                    if dist_vizinho < distancia[vizinho]:
-                        distancia[vizinho] = dist_vizinho
-                        heapq.heappush(fila_prioridade, (dist_vizinho, vizinho))
+            # Verifica se existem ciclos de peso negativo
+            for s, d, w in self.g.edges(data='weight'):
+                if distancias[s] != float("Inf") and distancias[s] + w < distancias[d]:
+                    print("O digrafo contem ciclos negativos")
+                    break
 
-        # Retorna as distâncias mínimas de todos os vértices ao vértice inicial
-        return distancia
+            # Retorna as distâncias mínimas de todos os vértices ao vértice inicial e o vértice predecessor no caminho mínimo de v até cada vértice
+            for chave, valor in distancias.items():
+                print("A Distancia minima de ", vertice_inicial, " ate ", chave, " é: ", valor)
+        
+            
+            predecessor = list(predecessor.values())
+            print("\nLista de predecessores de cada um dos vertices seguindo a ordem de cima:")
+            print(predecessor)
 
 
-    def ler_arquivo(grafo, nome_do_arquivo):
+    def ler_arquivo(self, nome_do_arquivo):
         # Abre o arquivo e lê linha por linha
         try:
             with open(nome_do_arquivo, 'r') as arquivo:
-                for linha in arquivo:
+                A = arquivo.readlines()
+                for linha in A:
                     # Divide a linha em origem, destino e peso
-                    origem, destino, peso = linha.strip().split()[1:]
+                    numeros = []
+                    numeros.append([str(num) for num in linha.strip().split()[1:]])
                     # Adiciona o arco ao grafo
-                    grafo.adicionaAresta(str(origem), str(destino), int(peso))
+                    self.adicionaAresta(numeros)
             print("Arquivo lido com sucesso :)")
 
         except:
