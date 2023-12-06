@@ -14,7 +14,7 @@ class Grafo:
 
     #função que adiciona aresta
     def adicionaAresta(self, numeros):  
-        if len(numeros) == 2: 
+        if len(numeros[0]) == 3: 
             self.g.add_edge(numeros[0][0], numeros[0][1], numeros[0][2])
             self.num_m += 1
             

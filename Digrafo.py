@@ -16,7 +16,7 @@ class Digrafo:
         #As arestas podem ser adicionadas tanto por inserção direta, ou seja digitando quais serão os verticies e o peso da aresta, 
         # quanto pela leitura de um arquivo dado.
         if numeros:
-            if len(numeros) == 2:
+            if len(numeros[0]) == 3:
                 self.digrafo.add_edge(numeros[0][0], numeros[0][1], weight=int(numeros[0][2]))
                 self.num_m += 1
                 if numeros[0][0] not in self.vertices:
